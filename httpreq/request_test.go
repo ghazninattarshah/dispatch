@@ -21,6 +21,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 		urlpath       string
 		pathParams    []string
 		queryParams   map[string]string
+		headerParams  map[string]string
 		body          io.Reader
 		bodyStruct    interface{}
 		bodyValues    url.Values
@@ -32,9 +33,10 @@ func TestHttpRequestDispatch(t *testing.T) {
 		expectedError error
 	}{
 		{
-			"InvalidMethod",
+			"EmptyMethod",
 			"",
 			"",
+			nil,
 			nil,
 			nil,
 			nil,
@@ -48,9 +50,27 @@ func TestHttpRequestDispatch(t *testing.T) {
 			errorMethodIsEmpty,
 		},
 		{
+			"InvalidMethod",
+			"test",
+			"",
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			false,
+			"",
+			"",
+			nil,
+			false,
+			errMethodUnknown,
+		},
+		{
 			"NoPathParamValuePassed",
 			http.MethodGet,
 			"/:user",
+			nil,
 			nil,
 			nil,
 			nil,
@@ -72,6 +92,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			false,
 			"",
 			"",
@@ -84,6 +105,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			http.MethodGet,
 			"/:user",
 			[]string{"bar"},
+			nil,
 			nil,
 			nil,
 			nil,
@@ -104,6 +126,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			true,
 			"",
 			"",
@@ -116,6 +139,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			http.MethodPost,
 			"/users/:user",
 			[]string{"foo"},
+			nil,
 			nil,
 			nil,
 			nil,
@@ -139,6 +163,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			true,
 			"",
 			"",
@@ -155,6 +180,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			true,
 			"",
 			"",
@@ -166,6 +192,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			"ValidPostRequestWithBodyStruct",
 			http.MethodPost,
 			"/users",
+			nil,
 			nil,
 			nil,
 			nil,
@@ -189,6 +216,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			url.Values{
 				"username": []string{"john"},
 			},
@@ -203,6 +231,7 @@ func TestHttpRequestDispatch(t *testing.T) {
 			"ValidPostRequestWithBody",
 			http.MethodPost,
 			"/users",
+			nil,
 			nil,
 			nil,
 			bytes.NewBufferString(`{
@@ -225,9 +254,8 @@ func TestHttpRequestDispatch(t *testing.T) {
 			map[string]string{
 				"wrb": "true", // writeresponsebody
 			},
-			bytes.NewBufferString(`{
-				"name": "foo"
-			}`),
+			nil,
+			nil,
 			nil,
 			nil,
 			true,
@@ -242,19 +270,18 @@ func TestHttpRequestDispatch(t *testing.T) {
 			http.MethodPost,
 			"/users",
 			nil,
+			nil,
 			map[string]string{
-				"wrb": "true", // writeresponsebody
+				"Authorization": "ksjhf23j1lkj23",
 			},
-			bytes.NewBufferString(`{
-				"name": "foo"
-			}`),
+			nil,
 			nil,
 			nil,
 			false,
 			"foo",
 			"foopazz",
 			"",
-			true,
+			false,
 			nil,
 		},
 	}
@@ -278,6 +305,8 @@ func TestHttpRequestDispatch(t *testing.T) {
 					r.QueryParam(k, v)
 				}
 			}
+
+			r.BasicAuth(test.username, test.password)
 
 			if test.body != nil {
 				r.Body(test.body)
