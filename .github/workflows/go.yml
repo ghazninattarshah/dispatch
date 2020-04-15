@@ -30,7 +30,7 @@ jobs:
 
     - name: Coverage
       env:
-        CODECOV_TOKEN: ${{CODECOV_TOKEN}}
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run :
         go test -v -cover ./... -coverprofile=coverage.out
         bash <(curl -s https://codecov.io/bash)
