@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 )
 
 func TestHttpRequestDispatch(t *testing.T) {
@@ -307,6 +308,15 @@ func TestHttpRequestDispatch(t *testing.T) {
 			}
 
 			r.BasicAuth(test.username, test.password)
+			r.Timeout(10 * time.Second)
+			r.UnescapeQueryParams(true)
+			r.ProxyURL(serv.URL + test.urlpath)
+
+			if test.headerParams != nil {
+				for k, v := range test.headerParams {
+					r.Header(k, v)
+				}
+			}
 
 			if test.body != nil {
 				r.Body(test.body)
