@@ -224,7 +224,7 @@ func (r *Request) Dispatch() (*http.Response, error) {
 	}
 
 	// Sets the content type
-	if r.contentType != "" {
+	if contentType != "" {
 		req.Header.Add("Content-Type", contentType)
 	}
 
@@ -335,10 +335,6 @@ func (r *Request) validatePathParams() error {
 
 		// sets the final url after injecting path params
 		r.url = strings.Join(splits, urlSeparator)
-	}
-
-	if r.method == "" {
-		return errMethodUnknown
 	}
 	return nil
 }
