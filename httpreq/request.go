@@ -100,7 +100,7 @@ func (r *Request) PathParams(params ...string) *Request {
 	return r
 }
 
-// QueryParam Set a query paramter to a request
+// QueryParam Set a query parameter to a request
 // Ex: http://foo.com/api/users?name=username
 func (r *Request) QueryParam(key, value string) *Request {
 	r.queryParams[key] = value
